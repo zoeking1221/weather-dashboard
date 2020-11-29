@@ -1,5 +1,5 @@
-Refactored Work Day Scheduler starter code. Work Day Scheduler provides a one day calendar with time blocks of the workday (between 9am-5pm). The top of the calendar displays the current day. When a user enters a task in an hour block and hits the save button, the task saves to local storage and reappears if user refreshes the page. Time blocks are color coded based on current time. Current hour block will appear red, all past time blocks will be grey, and future time blocks will be green.
+Created a Weather Dashboard to assist users in planning trips. Dashboard allows users to search a city and view the following weather data from that day: temperature, humidity, wind speed, and UV index. It also displays weather details for 5 days ahead. Dashboard saves all previously searched cities using local storage so user can easily access the weather data for those cities without searching again. Dashboard uses API from Open Weather Map for weather information.
 
-Link: https://zoeking1221.github.io/workday-scheduler/
+Link: https://zoeking1221.github.io/weather-dashboard/
 
-![Mock up of Work Day Scheduler](./assets/mockup.png?raw=true "Mock up of Work Day Scheduler")
+![Weather Dashboard](./assets/mockup.png?raw=true "Mock up of Weather Dashboard")
