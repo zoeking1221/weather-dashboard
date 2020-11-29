@@ -99,7 +99,7 @@ var displayCurrent = function(data) {
     // uv index
     var lat = data.coord.lat;
     var lon = data.coord.lon;
-    fetch("http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon +"&appid=1ff931a046e8da2e9dbb764cf69663cb")
+    fetch("https://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon +"&appid=1ff931a046e8da2e9dbb764cf69663cb")
     .then(function(response) {
         return response.json();
     })
