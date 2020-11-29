@@ -34,9 +34,7 @@ var searchedCitiesEl = document.querySelector("#searched-cities");
 var cityClickEl = document.querySelector("city-click");
 
 
-// create function to print city list
-// take al items in searched cities array and print them, add class city-click that allows you to click (for loop)
-// creat different event listener for city-click class that runs the above function on (different functions for current and five that passes in value of clicked item)
+// function to print previously searched cities
 var printCityList = function() {
     var cityList = JSON.parse(localStorage.getItem("city"));
     if (cityList) {
@@ -49,26 +47,11 @@ var printCityList = function() {
         searchedCity.addClass("city-click");
         $(searchedCitiesEl).append(searchedCity);
     };
-    // searchedCity.on("click", function(event) {
-    //     event.preventDefault();
-    //     console.log(searchedCity.innerHTML);
-    // })
 }
 
-$(searchedCitiesEl).on("click", function(event) {
-    if (event.target.classList.contains("city-click")) {
-        var currentCityClick = event.target.innerHTML;
-    }
-    else {
-        return;
-    }
-    currentWeather(currentCityClick);
-    fiveDayForecast(currentCityClick);
-});
 
 // fetch call to weather api
 var currentWeather = function(currentCity) {
-    // var currentCity = cityInputEl.value.trim();
     var cityList = JSON.parse(localStorage.getItem("city"));
     if (cityList) {
         searchedCitiesArray = cityList;
@@ -237,12 +220,24 @@ var displayFiveDay = function(data) {
 
 printCityList();
 
-// event listeners
+// event listener - submit button
 $(submitBtnEl).on("click", function(event) {
     event.preventDefault();
     var currentCitySearch = cityInputEl.value.trim();
     currentWeather(currentCitySearch);
     fiveDayForecast(currentCitySearch);
+});
+
+// event listener - previously searched cities
+$(searchedCitiesEl).on("click", function(event) {
+    if (event.target.classList.contains("city-click")) {
+        var currentCityClick = event.target.innerHTML;
+    }
+    else {
+        return;
+    }
+    currentWeather(currentCityClick);
+    fiveDayForecast(currentCityClick);
 });
 
 
