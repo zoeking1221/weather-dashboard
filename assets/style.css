@@ -3,3 +3,21 @@
 	display: block;
 	text-align: center;
 }
+
+.favorable {
+	background-color: green;
+	color: white;
+}
+
+.moderate {
+	background-color: yellow;
+}
+
+.severe {
+	background-color: red;
+	color: white;
+}
+
+ul {
+	list-style-type: none;
+}

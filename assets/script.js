@@ -3,7 +3,7 @@ var cityEl = document.querySelector("#city");
 var temperatureCurrEl = document.querySelector("#current-temperature");
 var humidityCurrEl = document.querySelector("#current-humidity");
 var windCurrEl = document.querySelector("#current-wind");
-var uvCurrEl = document.querySelector("#current-uv");
+var indexEl = document.querySelector("#current-uv")
 var temp1El = document.querySelector("#temp-1");
 var humidity1El = document.querySelector("#humidity-1");
 var temp2El = document.querySelector("#temp-2");
@@ -26,12 +26,67 @@ var day2DateEl = document.querySelector("#date-2");
 var day3DateEl = document.querySelector("#date-3");
 var day4DateEl = document.querySelector("#date-4");
 var day5DateEl = document.querySelector("#date-5");
-var iconCurrEl = document.querySelector("#current-icon")
+var iconCurrEl = document.querySelector("#current-icon");
+var cityInputEl = document.querySelector("#city-input");
+var submitBtnEl = document.querySelector("#submit-btn")
+var searchedCitiesArray = [];
+var searchedCitiesEl = document.querySelector("#searched-cities");
+var cityClickEl = document.querySelector("city-click");
 
+
+// create function to print city list
+// take al items in searched cities array and print them, add class city-click that allows you to click (for loop)
+// creat different event listener for city-click class that runs the above function on (different functions for current and five that passes in value of clicked item)
+var printCityList = function() {
+    var cityList = JSON.parse(localStorage.getItem("city"));
+    if (cityList) {
+        searchedCitiesArray = cityList;
+    }
+    console.log(searchedCitiesArray);
+    searchedCitiesEl.textContent = "";
+    for (i = 0; i < searchedCitiesArray.length; i++) {
+        var searchedCity = $("<li>").text(searchedCitiesArray[i]);
+        searchedCity.addClass("city-click");
+        $(searchedCitiesEl).append(searchedCity);
+    };
+    // searchedCity.on("click", function(event) {
+    //     event.preventDefault();
+    //     console.log(searchedCity.innerHTML);
+    // })
+}
+
+$(searchedCitiesEl).on("click", function(event) {
+    if (event.target.classList.contains("city-click")) {
+        var currentCityClick = event.target.innerHTML;
+    }
+    else {
+        return;
+    }
+    currentWeather(currentCityClick);
+    fiveDayForecast(currentCityClick);
+});
 
 // fetch call to weather api
-var currentWeather = function() {
-    fetch("http://api.openweathermap.org/data/2.5/weather?q=Philadelphia&units=imperial&appid=1ff931a046e8da2e9dbb764cf69663cb")
+var currentWeather = function(currentCity) {
+    // var currentCity = cityInputEl.value.trim();
+    var cityList = JSON.parse(localStorage.getItem("city"));
+    if (cityList) {
+        searchedCitiesArray = cityList;
+        if (searchedCitiesArray.includes(currentCity)) {
+        }
+        else {
+        searchedCitiesArray.push(currentCity);
+        localStorage.setItem("city", JSON.stringify(searchedCitiesArray));
+        };
+    }
+    else {
+        searchedCitiesArray.push(currentCity);
+        localStorage.setItem("city", JSON.stringify(searchedCitiesArray)); 
+    }
+
+    printCityList();
+
+    fetch("http://api.openweathermap.org/data/2.5/weather?q=" + currentCity + "&units=imperial&appid=1ff931a046e8da2e9dbb764cf69663cb")
     .then(function(response) {
         return response.json();
     })
@@ -41,26 +96,70 @@ var currentWeather = function() {
     });
 };
 
+
 // function to display current weather info
 var displayCurrent = function(data) {
-    cityDateEl.textContent = "City " + "(" + currentDateEl + ")";
+    iconCurrEl.textContent = "";
+    // var currentCity = cityInputEl.value.trim();
+    cityDateEl.textContent = data.name + " (" + currentDateEl + ")";
     var temp = data.main.temp;
     var humidity = data.main.humidity;
     var wind = data.wind.speed;
     temperatureCurrEl.textContent = "Temperature: " + temp + " °F";
     humidityCurrEl.textContent = "Humidity: " + humidity + "%";
-    windCurrEl.textContent = "Wind Speed: " + wind + " MPH";
-    
+    windCurrEl.textContent = "Wind Speed: " + wind + " MPH";  
     var iconCurrent = data.weather[0].icon;
-    var icoCurrImg = document.createElement('img');
-    icoCurrImg.setAttribute('src', "http://openweathermap.org/img/wn/" + iconCurrent + "@2x.png");
-    iconCurrEl.appendChild(icoCurrImg);
+    var iconCurrImg = document.createElement('img');
+    iconCurrImg.setAttribute('src', "http://openweathermap.org/img/wn/" + iconCurrent + "@2x.png");
+    iconCurrEl.appendChild(iconCurrImg);
 
+    // uv index
+    var lat = data.coord.lat;
+    var lon = data.coord.lon;
+    fetch("http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon +"&appid=1ff931a046e8da2e9dbb764cf69663cb")
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        var index = data.value;
+        indexEl.textContent = " " + index;
+        if (index <= 2) {
+            $(indexEl).addClass("favorable");
+        }
+        else if (index > 2 & index <= 5) {
+            $(indexEl).addClass("moderate");
+        }
+        else {
+            $(indexEl).addClass("severe");
+        }
+    });
 }
 
+
 // fetch call for 5 day forecast
-var fiveDayForecast = function() {
-    fetch("http://api.openweathermap.org/data/2.5/forecast?q=Philadelphia&units=imperial&&appid=1ff931a046e8da2e9dbb764cf69663cb")
+var fiveDayForecast = function(currentCity) {
+    
+    // clear data from previous search
+    $(indexEl).removeClass("moderate favorable severe");
+    while (icon1El.hasChildNodes()) {
+        icon1El.removeChild(icon1El.firstChild);
+    }
+    while (icon2El.hasChildNodes()) {
+        icon2El.removeChild(icon2El.firstChild);
+    }
+    while (icon3El.hasChildNodes()) {
+        icon3El.removeChild(icon3El.firstChild);
+    }
+    while (icon4El.hasChildNodes()) {
+        icon4El.removeChild(icon4El.firstChild);
+    }
+    while (icon5El.hasChildNodes()) {
+        icon5El.removeChild(icon5El.firstChild);
+    }
+
+    // get input city text, then use to fetch api
+    // var currentCity = cityInputEl.value.trim();
+    fetch("http://api.openweathermap.org/data/2.5/forecast?q=" + currentCity + "&units=imperial&&appid=1ff931a046e8da2e9dbb764cf69663cb")
     .then(function(response) {
         return response.json();
     })
@@ -68,7 +167,7 @@ var fiveDayForecast = function() {
         console.log(data);
         displayFiveDay(data);
     })
-}
+};
 
 // function to display 5 day forecast
 var displayFiveDay = function(data) {
@@ -135,14 +234,18 @@ var displayFiveDay = function(data) {
 }
 
 
-// var getUserUV = function() {
-//     fetch()
-//     .then
-// }
 
-// call current weather and 5 day functions
-currentWeather();
-fiveDayForecast();
+printCityList();
+
+// event listeners
+$(submitBtnEl).on("click", function(event) {
+    event.preventDefault();
+    var currentCitySearch = cityInputEl.value.trim();
+    currentWeather(currentCitySearch);
+    fiveDayForecast(currentCitySearch);
+});
+
+
 
 
 
